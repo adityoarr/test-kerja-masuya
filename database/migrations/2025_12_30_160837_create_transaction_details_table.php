@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('transaction_details', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('transaction_id')->constrained('transactions')->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('products');
+            // Snapshot produk
+            $table->string('product_code_snapshot')->nullable();
+            $table->string('product_name_snapshot')->nullable();
+            $table->integer('qty');
+            $table->decimal('price', 15, 2);
+            // Diskon bertingkat
+            $table->decimal('disc1', 5, 2)->default(0);
+            $table->decimal('disc2', 5, 2)->default(0);
+            $table->decimal('disc3', 5, 2)->default(0);
+            $table->decimal('net_price', 15, 2);
+            $table->decimal('subtotal', 15, 2);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('transaction_details');
+    }
+};
