@@ -38,8 +38,9 @@
             <table class="table table-bordered" id="productTable">
                 <thead>
                     <tr>
-                        <th>Produk</th>
-                        <th>Qty</th>
+                        <th style="width: 30%">Produk</th>
+                        <th style="width: 15%">Harga Satuan</th>
+                        <th style="width: 10%">Qty</th>
                         <th>Disc 1 (%)</th>
                         <th>Disc 2 (%)</th>
                         <th>Disc 3 (%)</th>
@@ -60,19 +61,23 @@
         const products = @json($products);
 
         function addRow() {
-            let options = '<option value="">Pilih Produk</option>';
+            let options = '<option value="" data-price="0">Pilih Produk</option>';
             products.forEach(p => {
-                options += `<option value="${p.id}">${p.code} - ${p.name} (Stok: ${p.stock})</option>`;
+                options +=
+                    `<option value="${p.id}" data-price="${p.price}">${p.code} - ${p.name} (Stok: ${p.stock})</option>`;
             });
 
             const html = `
                 <tr id="row${rowIdx}">
                     <td>
-                        <select name="products[${rowIdx}][product_id]" class="form-control" required>
+                        <select name="products[${rowIdx}][product_id]" class="form-control" onchange="updatePrice(this, ${rowIdx})" required>
                             ${options}
                         </select>
                     </td>
-                    <td><input type="number" name="products[${rowIdx}][qty]" class="form-control" min="1" required></td>
+                    <td>
+                        <input type="number" name="products[${rowIdx}][price]" id="price_${rowIdx}" class="form-control" required>
+                    </td>
+                    <td><input type="number" name="products[${rowIdx}][qty]" class="form-control" min="1" value="1" required></td>
                     <td><input type="number" name="products[${rowIdx}][disc1]" class="form-control" min="0" max="100" value="0"></td>
                     <td><input type="number" name="products[${rowIdx}][disc2]" class="form-control" min="0" max="100" value="0"></td>
                     <td><input type="number" name="products[${rowIdx}][disc3]" class="form-control" min="0" max="100" value="0"></td>
@@ -81,6 +86,11 @@
             `;
             document.querySelector('#productTable tbody').insertAdjacentHTML('beforeend', html);
             rowIdx++;
+        }
+
+        function updatePrice(selectElement, index) {
+            const price = selectElement.options[selectElement.selectedIndex].getAttribute('data-price');
+            document.getElementById(`price_${index}`).value = price;
         }
 
         function removeRow(id) {
